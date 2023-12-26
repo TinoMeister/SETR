@@ -8,10 +8,10 @@ int mapCodeToButton(unsigned long code) {
     code >>= 16;
     // Check that the value and inverse bytes are complementary.
     if (((code >> 8) ^ (code & 0x00FF)) == 0x00FF) {
-      return code & 0xFF;
+      return code & 0xFF; // Extract the lower 8 bits as the button code
     }
   }
-  return -1;
+  return -1; // Return -1 if the code doesn't match the expected format
 }
 
 int readInfrared() {
@@ -28,42 +28,50 @@ int readInfrared() {
   return result;
 }
 
+void openGate() {
+  for (int i = 5; i < 170; i++) {
+    myservo.write(i);
+    delay(30);
+  }
+}
+
+void closeGate() {
+  for (int i = 170; i > 5; i--) {
+    myservo.write(i);
+    delay(30);
+  }
+}
+
 void TaskSystemD(void *pvParameters)
 {
   (void)pvParameters;
   unsigned long time;
   int button = -1;
+  bool isOpen = false;
 
   while (1) 
   {
-    //Serial.println(F("System D"));
     button = readInfrared();
 
     switch (button) {
-      case 12: // 1
-        // statements
+      case 12: // Button 1
+        // Toggle LED state for Room3
         statesLed[0] = !statesLed[0];
         digitalWrite(Room3, LOW);
         break;
-      case 24: // 2
-        // statements
+      case 24: // Button 2
+        // Toggle LED state for Room4
         statesLed[1] = !statesLed[1];
         digitalWrite(Room4, LOW);
         break;
-      case 94: // 3
-        // statements
-        break;
-      case 8: // 4
-        // statements
-        break;
-      case 28: // 5
-        // statements
-        break;
-      case 90: // 6
-        // statements
+      case 94: // Button 3
+        // Toggle gate state (open/close)
+        if (isOpen) closeGate();
+        else openGate();
+        isOpen = !isOpen;
         break;
       default:
-        // statements
+        // No action for other buttons
         break;
     }
     

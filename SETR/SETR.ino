@@ -1,3 +1,4 @@
+#include <Servo.h>
 #include <Wire.h>
 #include <Arduino_FreeRTOS.h>
 #include <LiquidCrystal.h>
@@ -14,6 +15,7 @@
 #define AC 53
 
 #define Command 5
+#define SERVO 30
 
 #define Buzzer 39
 #define PIR 7
@@ -24,6 +26,8 @@
 DHT dht(DHTPIN, DHTTYPE);
 
 LiquidCrystal lcd(51, 2, 3, 4, 49, 47);
+
+Servo myservo;
 
 //Function Declaration
 void TaskSystemA(void *pvParameters);
@@ -48,13 +52,10 @@ void setup() {
   pinMode(Room2, OUTPUT);
   pinMode(Room3, OUTPUT);
   pinMode(Room4, OUTPUT);
-
   pinMode(Light, INPUT); 
   pinMode(AC, OUTPUT);
-
   pinMode(Buzzer, OUTPUT);
   noTone(Buzzer);
-  
   pinMode(Button, INPUT_PULLUP);
   pinMode(PIR, INPUT);
 
@@ -66,6 +67,9 @@ void setup() {
 
   // Initialize LCD
   lcd.begin(16, 2);
+
+  myservo.attach(SERVO);
+  myservo.write(5);
 
   // Set initial state for Room1 LEDs and LCD
   digitalWrite(Room1R, LOW);
